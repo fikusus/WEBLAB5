@@ -15,7 +15,7 @@ connection.connect();
 
 let sql = {
   auth: (login, password, tablename, callback) => {
-    var sql = `SELECT sessionkey FROM ${tablename} WHERE login = '${login}' AND password = '${CryptoJS.HmacSHA256(
+    var sql = `SELECT * FROM ${tablename} WHERE login = '${login}' AND password = '${CryptoJS.HmacSHA256(
       password,
       key
     )}' ;`;
@@ -103,14 +103,26 @@ let sql = {
     });
   },
 
-  getUserList: (login, callback) => {
-    var sql = `SELECT *  FROM users where;`;
+  getUserList: (callback) => {
+    var sql = `SELECT *  FROM users;`;
 
     connection.query(sql, function (error, results) {
       if (error) {
         return callback(SQLErrorMgs, null);
       } else {
         return callback(null, results);
+      }
+    });
+  },
+
+  changeLock: (login, status,callback) => {
+    var sql = `Update users set locked = ${status} where login = '${login}';`;
+    console.log(sql);
+    connection.query(sql, function (error, results) {
+      if (error) {
+        return callback(SQLErrorMgs, null);
+      } else {
+        return callback(null, "OK");
       }
     });
   },

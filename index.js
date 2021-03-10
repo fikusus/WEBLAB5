@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = 3001;
 var bodyParser = require("body-parser");
 var CryptoJS = require("crypto-js");
 const router = require("./router");
@@ -27,9 +27,15 @@ app.post("/auth", async (req, res) => {
           if (results.length === 0) {
             res.send('{"error":"Логин/пароль неверние"}');
           } else {
-            res.send(
-              `{"session":"${CryptoJS.HmacSHA256(req.body.login, key)}"}`
-            );
+            console.log(results);
+            if(results[0].locked === 1){
+              res.send(`{"error":"Пользователь заблокирован"}`);
+            }else{
+              res.send(
+                `{"session":"${CryptoJS.HmacSHA256(req.body.login, key)}"}`
+              );
+            }
+
           }
         }
       }
@@ -71,25 +77,64 @@ app.post("/chekUserSession", async (req, res) => {
       if (error) {
         res.send(`{"error":"${error}"}`);
       } else {
-        console.log(results);
-        res.send(results);
+        if(results.locked === 1){
+          res.send(`{"error":"Locked"}`);
+        }else{
+          res.send(results);
+        }
       }
     });
   }
 });
 app.post("/getuserlist", async (req, res) => {
-  if (req.body.key) {
-    sql.getGameList(function (error, result) {
+    sql.getUserList(async function (error, result) {
       if (error) {
         res.send(`{"error":"${error}"}`);
       } else {
-        res.send(result);
+
+
+        let temp = await openList(req.body.list, req.body.count, result);
+        let count = Math.ceil(result.length / req.body.count);
+        let out = {
+          type: "changeList",
+          count: count,
+          array: temp,
+          currVal:req.body.list
+        };
+        res.send(out);
+
       }
     });
-  } else {
-    res.send('{"error":"error"}');
-  }
 });
+
+
+app.post("/changeStatus", async (req, res) => {
+    sql.changeLock(req.body.login, req.body.status, function (error, result) {
+      if (error) {
+        res.send(`{"error":"${error}"}`);
+      } else {
+        res.send(`{"result":"${result}"}`);
+      }
+    });
+});
+
+async function openList(list, currVal, carray) {
+  let out = [];
+  let end = list * currVal;
+
+  if (end > carray.length) {
+    end = carray.length;
+  }
+  let begin = (list - 1) * currVal;
+
+  console.log(begin + " " + end);
+  for (let i = begin; i < end; i++) {
+    console.log("end " + carray[i]);
+    out.push(carray[i]);
+  }
+
+  return out;
+}
 
 app.listen(port, async () => {
   console.log(`Example app listening at http://localhost:${port}`);
