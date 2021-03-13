@@ -118,6 +118,18 @@ app.post("/changeStatus", async (req, res) => {
     });
 });
 
+
+app.post("/deleteUser", async (req, res) => {
+  console.log(req.body.login)
+  sql.deleteUser(req.body.login, function (error, result) {
+    if (error) {
+      res.send(`{"error":"${error}"}`);
+    } else {
+      res.send(`{"result":"${result}"}`);
+    }
+  });
+});
+
 async function openList(list, currVal, carray) {
   let out = [];
   let end = list * currVal;

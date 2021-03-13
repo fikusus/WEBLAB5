@@ -126,6 +126,18 @@ let sql = {
       }
     });
   },
+
+  deleteUser: (login ,callback) => {
+    var sql = `DELETE FROM USERS where login = '${login}';`;
+    console.log(sql);
+    connection.query(sql, function (error, results) {
+      if (error) {
+        return callback(SQLErrorMgs, null);
+      } else {
+        return callback(null, "OK");
+      }
+    });
+  },
 };
 
 module.exports = sql;

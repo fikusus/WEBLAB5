@@ -27,3 +27,10 @@
     width: 6em;
     margin-top: 100px;
   }
+
+  #counter{
+    background-color: black;
+    width: 100px;
+    color: white;
+    text-align: center;
+  }

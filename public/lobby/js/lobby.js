@@ -147,7 +147,8 @@ function drawData(result){
         <th>Name</th>
         <th>Type</th>
         <th>Satus</th>
-        <th>Action</th>
+        <th>Lock Users</th>
+        <th>Delete Users</th>
       </tr>`;
     } else {
       out = `<table id="customers">
@@ -176,6 +177,7 @@ function drawData(result){
         } else {
           out += `    <td><button class = "unlock" value = '{"login":"${rarray[i].login}", "act":1}'>Lock</button></td>`;
         }
+        out += `    <td><button class = "delete" value = '{"login":"${rarray[i].login}", "act":0}'>Delete</button></td>`;
       }
       out += `</tr>`;
     }
@@ -190,6 +192,21 @@ function drawData(result){
         {
           login: out.login,
           status: out.act,
+        },
+        function (result) {
+          initPag();
+        }
+      );
+    });
+
+
+    $(".delete").click(function (event) {
+      console.log(event.target.value);
+      let out = JSON.parse(event.target.value);
+      sendRequest(
+        "deleteUser",
+        {
+          login: out.login,
         },
         function (result) {
           initPag();
