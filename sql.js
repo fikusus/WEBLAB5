@@ -35,10 +35,10 @@ let sql = {
 
   register: (login, password, tablename,userData, callback) => {
     let sql_find_user = `SELECT COUNT(*) as solution FROM ${tablename} where login = '${login}';`;
-    let sql_insert_user = `INSERT INTO ${tablename} (login, password, sessionkey) values ('${login}', '${CryptoJS.HmacSHA256(
+    let sql_insert_user = `INSERT INTO ${tablename} (login, password, sessionkey,regDate) values ('${login}', '${CryptoJS.HmacSHA256(
       password,
       key
-    )}', '${CryptoJS.HmacSHA256(login, key)}')`;
+    )}', '${CryptoJS.HmacSHA256(login, key)}', '${new Date().toString()}')`;
 
       console.log(sql_insert_user);
 
@@ -47,7 +47,8 @@ let sql = {
         login VARCHAR(128) PRIMARY KEY,
         password VARCHAR(128) NOT NULL,
         locked BOOLEAN DEFAULT 0,
-        admin BOOLEAN DEFAULT 0
+        admin BOOLEAN DEFAULT 0,
+        regDate VARCHAR(128) NOT NULL
     )`;
     connection.query(sql_find_user, function (error, results, fields) {
       if (error) {

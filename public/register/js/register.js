@@ -1,5 +1,5 @@
 
-document.getElementById("regbutton").onclick = function (event) {
+/*document.getElementById("regbutton").onclick = function (event) {
   event.preventDefault();
   console.log("Testr");
   let login = $("#login").val();
@@ -38,4 +38,38 @@ document.getElementById("regbutton").onclick = function (event) {
       console.log(error);
     },
   });
-};
+};*/
+
+function showResult(text) {
+  console.log(text);
+  //document.querySelector('#result').innerHTML = text;
+}
+
+function handleClick(token) {
+  return function() {
+      var hello = document.querySelector('#hello').value;
+      var data = {
+          hello: "hello",
+          token: token
+      };
+
+      fetch('/send', {
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          method: 'post',
+          body: JSON.stringify(data)
+      })
+          .then(response => response.text())
+          .then(text => showResult(text))
+          .catch(error => showResult(error));
+  }
+}
+
+grecaptcha.ready(function() {
+  grecaptcha.execute('6LcP8H0aAAAAAH7Q_cQJIl_iRk4M2xzALQWyIXOH', {action: 'demo'})
+      .then(function(token) {
+          document.querySelector('#regbutton').addEventListener('click', handleClick(token));
+      });
+});

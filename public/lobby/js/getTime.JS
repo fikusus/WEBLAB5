@@ -1,4 +1,4 @@
 var tamestamp = new Date()
 $('document').ready(function(){
-    console.log(new Date()-tamestamp)
+document.getElementById("genTime").innerHTML = new Date()-tamestamp + "ms";
 });

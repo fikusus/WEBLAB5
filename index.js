@@ -6,7 +6,7 @@ var CryptoJS = require("crypto-js");
 const router = require("./router");
 const config = require("config");
 const sql = require("./sql");
-
+request = require('request');
 const key = config.get("key");
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -150,4 +150,25 @@ async function openList(list, currVal, carray) {
 
 app.listen(port, async () => {
   console.log(`Example app listening at http://localhost:${port}`);
+});
+
+
+app.post('/captcha', function(req, res) {
+  if(req.body['g-recaptcha-response'] === undefined || req.body['g-recaptcha-response'] === '' || req.body['g-recaptcha-response'] === null)
+  {
+    return res.json({"responseError" : "something goes to wrong"});
+  }
+  const secretKey = "6LfR8n0aAAAAAKjZz-l7dJ2CjdBSwAA6FNIlH1Qb";
+
+  const verificationURL = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + req.body['g-recaptcha-response'] + "&remoteip=" + req.connection.remoteAddress;
+
+  request(verificationURL,function(error,response,body) {
+    console.log(body);
+    body = JSON.parse(body);
+
+    if(body.success !== undefined && !body.success) {
+      return res.json({"responseError" : "Failed captcha verification"});
+    }
+    res.json({"responseSuccess" : "Sucess"});
+  });
 });
