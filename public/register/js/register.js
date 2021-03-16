@@ -1,5 +1,5 @@
-
-/*document.getElementById("regbutton").onclick = function (event) {
+let vtocken;
+document.getElementById("regbutton").onclick = function (event) {
   event.preventDefault();
   console.log("Testr");
   let login = $("#login").val();
@@ -23,6 +23,7 @@
       login: $("#login").val(),
       password: $("#password").val(),
       psw_repeat: $("#psw-repeat").val(),
+      g_recaptcha_response: vtocken
     },
     success: function (result) {
       if (result.error === undefined) {
@@ -38,38 +39,15 @@
       console.log(error);
     },
   });
-};*/
-
-function showResult(text) {
-  console.log(text);
-  //document.querySelector('#result').innerHTML = text;
-}
-
-function handleClick(token) {
-  return function() {
-      var hello = document.querySelector('#hello').value;
-      var data = {
-          hello: "hello",
-          token: token
-      };
-
-      fetch('/send', {
-          headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-          },
-          method: 'post',
-          body: JSON.stringify(data)
-      })
-          .then(response => response.text())
-          .then(text => showResult(text))
-          .catch(error => showResult(error));
-  }
-}
+};
 
 grecaptcha.ready(function() {
-  grecaptcha.execute('6LcP8H0aAAAAAH7Q_cQJIl_iRk4M2xzALQWyIXOH', {action: 'demo'})
-      .then(function(token) {
-          document.querySelector('#regbutton').addEventListener('click', handleClick(token));
+  // do request for recaptcha token
+  // response is promise with passed token
+      grecaptcha.execute('6LfR8n0aAAAAAArhkIsAhop8XexQzefcDqeJMpH5', {action:'validate_captcha'})
+                .then(function(token) {
+                  console.log(token);
+          // add token value to form
+          vtocken = token;
       });
-});
+  });

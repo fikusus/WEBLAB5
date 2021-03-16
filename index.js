@@ -44,31 +44,50 @@ app.post("/auth", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  if (
-    req.body.login &&
-    req.body.login !== "" &&
-    req.body.password !== null &&
-    req.body.password &&
-    req.body.psw_repeat !== null &&
-    req.body.psw_repeat &&
-    req.body.password === req.body.psw_repeat
-  ) {
-    sql.register(
-      req.body.login,
-      req.body.password,
-      "users",
-      null,
-      function (error, result) {
-        if (error) {
-          res.send(`{"error":"${error}"}`);
-        } else {
-          res.send(`{"session":"${CryptoJS.HmacSHA256(req.body.login, key)}"}`);
-        }
-      }
-    );
-  } else {
-    res.send('{"error":"error"}');
+  if(req.body['g_recaptcha_response'] === undefined || req.body['g_recaptcha_response'] === '' || req.body['g_recaptcha_response'] === null)
+  {
+    return res.json({"error" : "something goes to wrong"});
   }
+  const secretKey = "6LfR8n0aAAAAAKjZz-l7dJ2CjdBSwAA6FNIlH1Qb";
+
+  const verificationURL = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + req.body['g_recaptcha_response'] + "&remoteip=" + req.connection.remoteAddress;
+
+  request(verificationURL,function(error,response,body) {
+    console.log(body);
+    body = JSON.parse(body);
+
+    if(body.success !== undefined && !body.success) {
+      return res.json({"error" : "Failed captcha verification"});
+    }
+    if (
+      req.body.login &&
+      req.body.login !== "" &&
+      req.body.password !== null &&
+      req.body.password &&
+      req.body.psw_repeat !== null &&
+      req.body.psw_repeat &&
+      req.body.password === req.body.psw_repeat
+    ) {
+      sql.register(
+        req.body.login,
+        req.body.password,
+        "users",
+        null,
+        function (error, result) {
+          if (error) {
+            res.send(`{"error":"${error}"}`);
+          } else {
+            res.send(`{"session":"${CryptoJS.HmacSHA256(req.body.login, key)}"}`);
+          }
+        }
+      );
+    } else {
+      res.send('{"error":"error"}');
+    }
+  });
+
+
+
 });
 
 app.post("/chekUserSession", async (req, res) => {
