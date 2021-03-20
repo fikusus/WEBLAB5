@@ -17,4 +17,8 @@ router.get("/", async (req, res) => {
     res.sendFile(`${__dirname}/public/auth/auth.html`);
   });
 
+    router.get("/regex", async (req, res) => {
+    res.sendFile(`${__dirname}/public/regex/regex.html`);
+  });
+
 module.exports = router;

@@ -191,3 +191,14 @@ app.post('/captcha', function(req, res) {
     res.json({"responseSuccess" : "Sucess"});
   });
 });
+
+app.post("/regex", async (req, res) => {
+  console.log(req.body)
+  sql.deleteUser(req.body.login, function (error, result) {
+    if (error) {
+      res.send(`{"error":"${error}"}`);
+    } else {
+      res.send(`{"result":"${result}"}`);
+    }
+  });
+});
