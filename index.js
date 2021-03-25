@@ -68,6 +68,15 @@ app.post("/register", async (req, res) => {
       req.body.psw_repeat &&
       req.body.password === req.body.psw_repeat
     ) {
+      if(!/^(?=.*[A-Za-z0-9]$)[A-Za-z][A-Za-z\d.-]{0,19}$/g.test(req.body.login)){
+        res.send('{"error":"Invalig login format"}');
+        return;
+      }
+
+      if(!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/g.test(req.body.password)){
+        res.send('{"error":"Invalig password format"}');
+        return;
+      }
       sql.register(
         req.body.login,
         req.body.password,
@@ -193,12 +202,21 @@ app.post('/captcha', function(req, res) {
 });
 
 app.post("/regex", async (req, res) => {
-  console.log(req.body)
-  sql.deleteUser(req.body.login, function (error, result) {
-    if (error) {
-      res.send(`{"error":"${error}"}`);
-    } else {
-      res.send(`{"result":"${result}"}`);
-    }
-  });
+  console.log(req.body.html)
+  const regex1 = /<h[1-6][^>]*>(.*?)<\/h[1-6]>/gis;
+  const found1 = req.body.html.match(regex1);
+
+  const regex2 = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gis;
+  const found2 = req.body.html.match(regex2);
+console.log(found2);
+
+const regex3 = /href="([^"]*)"/gis;
+const found3 = req.body.html.match(regex3);
+
+let out = {
+  h:found1,
+  email:found2,
+  a:found3
+}
+res.send(out);
 });

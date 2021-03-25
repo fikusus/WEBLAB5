@@ -31,6 +31,12 @@ document.getElementById("regbutton").onclick = function (event) {
         window.location.replace("/lobby");
       } else {
         document.getElementById("error_msg").innerHTML = result.error;
+        grecaptcha.execute('6LfR8n0aAAAAAArhkIsAhop8XexQzefcDqeJMpH5', {action:'validate_captcha'})
+        .then(function(token) {
+          console.log(token);
+  // add token value to form
+  vtocken = token;
+});
       }
 
       console.log(result.error);
